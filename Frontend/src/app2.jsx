@@ -45,7 +45,7 @@ export default function GroceryDetection() {
       formData.append("file", img.file);
 
       try {
-        const response = await fetch("https://dcmsdczm-8000.inc1.devtunnels.ms/predict2", {
+        const response = await fetch("http://localhost:8000/detect", {
           method: "POST",
           body: formData,
         });

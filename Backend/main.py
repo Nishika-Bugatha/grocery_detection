@@ -133,7 +133,7 @@ def predict_and_visualize(image_path, conf_threshold=0.5, show_details=True):
     else:
         print("No objects detected")
          
-    output_path = "annotated_output.jpg"
-    cv2.imwrite(output_path, cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
-    print(f"Saved annotated image at: {output_path}")
+    #output_path = "annotated_output.jpg"
+    #cv2.imwrite(output_path, cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
+    #print(f"Saved annotated image at: {output_path}")
     return annotated_image
