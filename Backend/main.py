@@ -108,14 +108,17 @@ def predict_and_visualize(image_path, conf_threshold=0.5, show_details=True):
         plt.axis('off')
 
         plt.tight_layout()
-       
+
+        detections = {}
+
         if show_details:
             print("\n" + "="*60)
             print("DETECTION SUMMARY")
             print("="*60)
-
+    
             for class_name, count in class_counts.items():
                 print(f"{class_name}: {count} detected")
+                detections[class_name] = count
 
             print(f"\nTotal objects detected: {len(boxes)}")
             print(f"Average confidence: {np.mean([d['confidence'] for d in detection_details]):.3f}")
@@ -136,4 +139,6 @@ def predict_and_visualize(image_path, conf_threshold=0.5, show_details=True):
     #output_path = "annotated_output.jpg"
     #cv2.imwrite(output_path, cv2.cvtColor(annotated_image, cv2.COLOR_RGB2BGR))
     #print(f"Saved annotated image at: {output_path}")
-    return annotated_image
+    return {"output_image" : annotated_image, "detections": detections}
+
+

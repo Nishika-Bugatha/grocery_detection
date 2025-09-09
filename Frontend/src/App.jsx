@@ -9,8 +9,8 @@ export default function GroceryDetection() {
     const files = Array.from(e.target.files);
     const totalImages = images.length + files.length;
 
-    if (totalImages > 3) {
-      alert("You can only upload a maximum of 3 images!");
+    if (totalImages > 1) {
+      alert("You can only upload 1 image!");
       return;
     }
 
@@ -52,17 +52,21 @@ export default function GroceryDetection() {
 
         if (!response.ok) throw new Error("Failed to upload");
 
-        const data = await response.json(); // Expecting: { "image_base64": "<base64string>" }
+        const data = await response.json(); 
+        // Expecting: { "detections": {...}, "image_base64": "<base64string>" }
 
         if (data.image_base64) {
           const processedImg = `data:image/png;base64,${data.image_base64}`;
-          newResults.push(processedImg);
+          newResults.push({
+            image: processedImg,
+            detections: data.detections || {},
+          });
         } else {
-          newResults.push(null);
+          newResults.push({ image: null, detections: {} });
         }
       } catch (error) {
         console.error(error);
-        newResults.push(null);
+        newResults.push({ image: null, detections: {} });
       }
     }
 
@@ -78,7 +82,7 @@ export default function GroceryDetection() {
         className="bg-white shadow-lg rounded-2xl p-6 flex flex-col items-center w-full max-w-md"
       >
         <p className="w-full mb-2 text-gray-600 font-medium text-center">
-          Select up to 3 images ({images.length}/3)
+          Select one image 
         </p>
 
         <label
@@ -100,18 +104,42 @@ export default function GroceryDetection() {
         <div className="grid grid-cols-1 gap-6 mt-4 mb-4 w-full">
           {images.map((img, index) => (
             <div key={index} className="relative flex flex-col items-center">
+              {/* Original image */}
               <img
                 src={img.preview}
                 alt={`Original ${index + 1}`}
                 className="rounded-xl shadow-md h-48 w-48 object-cover mb-2"
               />
-              {results[index] && (
-                <img
-                  src={results[index]}
-                  alt={`Processed ${index + 1}`}
-                  className="rounded-xl shadow-md h-48 w-48 object-cover border-2 border-green-500"
-                />
+
+              {/* Processed image + detections */}
+              {results[index]?.image && (
+                <div className="flex flex-col items-center">
+                  <img
+                    src={results[index].image}
+                    alt={`Processed ${index + 1}`}
+                    className="rounded-xl shadow-md h-48 w-48 object-cover border-2 border-green-500"
+                  />
+
+                  {/* Detection counts */}
+                  {Object.keys(results[index].detections).length > 0 && (
+                    <div className="mt-2 bg-gray-50 border border-gray-200 rounded-lg p-2 w-48 text-sm text-gray-700 shadow-sm">
+                      <h3 className="font-semibold text-green-600 mb-1 text-center">
+                        Detections
+                      </h3>
+                      <ul className="space-y-1">
+                        {Object.entries(results[index].detections).map(([className, count], i) => (
+                          <li key={i} className="flex justify-between">
+                            <span>{className}</span>
+                            <span className="font-medium">{count}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               )}
+
+              {/* Delete button */}
               <button
                 type="button"
                 onClick={() => handleDeleteImage(index)}

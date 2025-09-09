@@ -51,9 +51,13 @@ async def predict_endpoint(file: UploadFile = File(...)):
 
         # Call your prediction function
         # It returns a NumPy array (OpenCV image)
-        output_image = predict_and_visualize(
-            temp_file_path, conf_threshold=0.5, show_details=False
+        result = predict_and_visualize(
+            temp_file_path, conf_threshold=0.5, show_details=True
         )
+
+        # Since result is a dict like {"output_image": annotated_image}
+        output_image = result["output_image"]
+        detection_details = result["detections"]
 
         # Delete temp file
         os.remove(temp_file_path)
@@ -67,7 +71,7 @@ async def predict_endpoint(file: UploadFile = File(...)):
         img_str = base64.b64encode(encoded_image.tobytes()).decode("utf-8")
 
         # Return as JSON
-        return JSONResponse(content={"image_base64": img_str})
+        return JSONResponse(content={"detections": detection_details,"image_base64": img_str})
 
     except Exception as e:
         return JSONResponse(content={"error": str(e)}, status_code=500)
